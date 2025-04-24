@@ -1,0 +1,150 @@
+.crud-contenedor {
+  padding: 2rem;
+  background-color: #f8fbff;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  max-width: 960px;
+  margin: 3rem auto;
+  font-family: 'Segoe UI', sans-serif;
+  border: 1px solid #dde8f3;
+}
+
+.crud-contenedor h2 {
+  font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #0d47a1;
+  font-weight: 700;
+}
+
+.crud-formulario {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.crud-formulario input {
+  padding: 0.7rem 1rem;
+  border: 1px solid #b0bec5;
+  border-radius: 10px;
+  min-width: 220px;
+  font-size: 1rem;
+  background-color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.crud-formulario input:focus {
+  border-color: #1565c0;
+  outline: none;
+  background-color: #f0f8ff;
+}
+
+.crud-formulario button {
+  padding: 0.75rem 1.5rem;
+  background-color: #ff7043; /* Coral */
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.crud-formulario button:hover {
+  background-color: #e64a19; /* Más intenso al pasar el mouse */
+}
+
+.crud-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.crud-tabla th {
+  background-color: #7c7c7cd5;
+  color: #fff;
+  padding: 1rem;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.crud-tabla td {
+  padding: 1rem;
+  text-align: center;
+  background-color: #f9fafe;
+  font-size: 0.95rem;
+  border-top: 1px solid #d6e0eb;
+  color: #263238;
+}
+
+.crud-tabla tr:hover td {
+  background-color: #e3f2fd;
+  transition: background-color 0.3s ease;
+}
+
+.crud-contenedor {
+  position: relative;
+  min-height: 600px;
+  /* ya tienes otros estilos aquí */
+}
+
+.crud-tabla tbody:empty {
+  display: none;
+}
+
+.logo-fondo {
+  position: absolute;
+  inset: 0;
+  z-index: 0; /* Aumentamos el z-index */
+  pointer-events: none;
+}
+
+.crud-contenedor > *:not(.logo-fondo) {
+  position: relative;
+  z-index: 1; /* Aseguramos que el contenido esté por encima */
+}
+
+.logo-small {
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  opacity: 0.15;
+  object-fit: contain;
+}
+
+/* Posiciones desordenadas */
+.logo1 {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.09;
+  width: 500px;
+  height: 500px;
+}
+
+.logo2 {
+  top: 5%;
+  left: 3%;
+}
+
+.logo3 {
+  bottom: 3%;
+  right: 5%;
+}
+
+.logo4 {
+  top: 60%;
+  right: 80%;
+}
+
+.logo5 {
+  top: 5%;
+  left: 70%;
+}
+
+
+
