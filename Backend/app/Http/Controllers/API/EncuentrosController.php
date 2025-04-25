@@ -2,210 +2,165 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Models\encuentros;
+use App\Models\Encuentros;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
 
 class EncuentrosController extends Controller
 {
     public function index()
     {
-
-        $encuentros = encuentros::all();
+        $encuentros = Encuentros::all();
 
         if ($encuentros->isEmpty()) {
-            $data = [
-
-                'message' => 'no se encontraron encuentros',
-                'status' => '200'
-            ];
-            return response()->json($data, 200);
+            return response()->json([
+                'message' => 'No se encontraron encuentros',
+                'status' => 200
+            ], 200);
         }
 
         return response()->json($encuentros, 200);
     }
 
-
-
     public function store(Request $request)
     {
-
-        $Validator = Validator::make($request->all(), [
-            'sede' => 'required|max:20',
+        $validator = Validator::make($request->all(), [
+            'sede' => 'required|max:50',
             'fecha' => 'required|date',
             'hora' => 'required|date_format:H:i:s',
-
+            'local' => 'required|max:100',
+            'visitante' => 'required|max:100',
         ]);
 
-        if ($Validator->Fails()) {
-
-            $data = [
-                'message' => 'error en la validacion de los datos',
-                'errors' => $Validator->errors(),
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Error en la validación de los datos',
+                'errors' => $validator->errors(),
                 'status' => 400
-            ];
-            return response()->json($data, 400);
+            ], 400);
         }
 
-        $encuentros = encuentros::create([
-            'sede' => $request->sede,
-            'fecha' => $request->fecha,
-            'hora' => $request->hora,
-            
-            
-        ]);
+        $encuentro = Encuentros::create($request->only([
+            'sede', 'fecha', 'hora', 'local', 'visitante'
+        ]));
 
-        if (!$encuentros) {
-            $data = [
-                'message' => 'error al crear el encuentro',
-                'status' => 500
-            ];
-            return response()->json($data, 500);
-        }
-
-        $data = [
-            'encuentro' => $encuentros,
+        return response()->json([
+            'encuentro' => $encuentro,
             'status' => 201
-        ];
-
-        return response()->json($data, 201);
+        ], 201);
     }
 
     public function show($id)
     {
-        $encuentros = encuentros::find($id);
+        $encuentro = Encuentros::find($id);
 
-        if (!$encuentros) {
-            $data = [
+        if (!$encuentro) {
+            return response()->json([
                 'message' => 'Encuentro no encontrado',
-                'status' => 400
-            ];
-            return response()->json($data, 404);
+                'status' => 404
+            ], 404);
         }
 
-        $data = [
-            'message' => $encuentros,
-            'status' => 200
-        ];
-        return response()->json($encuentros, 200);
+        return response()->json($encuentro, 200);
     }
 
     public function destroy($id)
     {
-        $encuentros = encuentros::find($id);
+        $encuentro = Encuentros::find($id);
 
-        if (!$encuentros) {
-            $data = [
-
-                'message' => 'Encuentro no encontrada',
+        if (!$encuentro) {
+            return response()->json([
+                'message' => 'Encuentro no encontrado',
                 'status' => 404
-
-            ];
-            return response()->json($data, 404);
+            ], 404);
         }
 
+        $encuentro->delete();
 
-        $encuentros->delete();
-        $data = [
+        return response()->json([
             'message' => 'Encuentro eliminado',
             'status' => 200
-        ];
-        return response()->json($data, 200);
+        ], 200);
     }
+
     public function update(Request $request, $id)
     {
-        $encuentros = encuentros::find($id);
-        if (!$encuentros) {
-            $data = [
-                'message' => 'encuentro no encontrado',
-                'status' => 400
-            ];
-            return response()->json($data, 404);
+        $encuentro = Encuentros::find($id);
+
+        if (!$encuentro) {
+            return response()->json([
+                'message' => 'Encuentro no encontrado',
+                'status' => 404
+            ], 404);
         }
 
-        $Validator = Validator::make($request->all(), [
-
-            'sede' => 'required|max:20',
+        $validator = Validator::make($request->all(), [
+            'sede' => 'required|max:50',
             'fecha' => 'required|date',
-            'hora' => 'required|date_format:H:i:s',            
-
+            'hora' => 'required|date_format:H:i:s',
+            'local' => 'required|max:100',
+            'visitante' => 'required|max:100',
         ]);
 
-        if ($Validator->Fails()) {
-
-            $data = [
-                'message' => 'error en la validacion de los datos',
-                'errors' => $Validator->errors(),
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Error en la validación de los datos',
+                'errors' => $validator->errors(),
                 'status' => 400
-            ];
-            return response()->json($data, 400);
+            ], 400);
         }
 
-        $encuentros->sede = $request->sede;
-        $encuentros->fecha = $request->fecha;
-        $encuentros->hora = $request->hora;
-        
-        $encuentros->Save();
+        $encuentro->update($request->only([
+            'sede', 'fecha', 'hora', 'local', 'visitante'
+        ]));
 
-        $data = [
-
+        return response()->json([
             'message' => 'Encuentro actualizado',
-            'encuentros' => $encuentros,
+            'encuentro' => $encuentro,
             'status' => 200
-        ];
-        return response()->json($data, 200);
+        ], 200);
     }
 
     public function updatePartial(Request $request, $id)
     {
+        $encuentro = Encuentros::find($id);
 
-        $encuentros = encuentros::find($id);
-        if (!$encuentros) {
-            $data = [
+        if (!$encuentro) {
+            return response()->json([
                 'message' => 'Encuentro no encontrado',
                 'status' => 404
-            ];
-            return response()->json($data, 404);
+            ], 404);
         }
 
-        $Validator = Validator::make($request->all(), [
-            'sede' => 'sometimes|max:20',
+        $validator = Validator::make($request->all(), [
+            'sede' => 'sometimes|max:50',
             'fecha' => 'sometimes|date',
             'hora' => 'sometimes|date_format:H:i:s',
-           
-            
+            'local' => 'sometimes|max:100',
+            'visitante' => 'sometimes|max:100',
         ]);
-        if ($Validator->Fails()) {
 
-            $data = [
-                'message' => 'error en la validacion de los datos',
-                'errors' => $Validator->errors(),
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Error en la validación de los datos',
+                'errors' => $validator->errors(),
                 'status' => 400
-            ];
-            return response()->json($data, 400);
+            ], 400);
         }
 
-        if ($request->has('sede')) {
-            $encuentros->sede = $request->sede;
-        }
-        if ($request->has('fecha')) {
-            $encuentros->fecha = $request->fecha;
-        }
-        if ($request->has('hora')) {
-            $encuentros->hora = $request->hora;
-        }
-        
-        
-        
-        $encuentros->save();
+        if ($request->has('sede')) $encuentro->sede = $request->sede;
+        if ($request->has('fecha')) $encuentro->fecha = $request->fecha;
+        if ($request->has('hora')) $encuentro->hora = $request->hora;
+        if ($request->has('local')) $encuentro->local = $request->local;
+        if ($request->has('visitante')) $encuentro->visitante = $request->visitante;
 
-        $data = [
-            'message' => 'Encuentro actualizada',
-            'encuentros' => $encuentros,
+        $encuentro->save();
+
+        return response()->json([
+            'message' => 'Encuentro actualizado parcialmente',
+            'encuentro' => $encuentro,
             'status' => 200
-        ];
-        return response()->json($data, 200);
+        ], 200);
     }
 }

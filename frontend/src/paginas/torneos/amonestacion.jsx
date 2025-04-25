@@ -17,6 +17,10 @@ const Amonestacion = () => {
     try {
       const response = await getAmonestaciones();
       const datosFormateados = response.data.map(item => ({
+        "Nombre del jugador": item.nombre_jugador,
+        "Número de camiseta": item.numero_camiseta,
+        "Equipo": item.equipo,
+        "Encuentro disputado": item.encuentro_disputado,
         "Tarjeta amarilla": item.tarjeta_amarilla,
         "Tarjeta azul": item.tarjeta_azul,
         "Tarjeta roja": item.tarjeta_roja,
@@ -30,7 +34,15 @@ const Amonestacion = () => {
   return (
     <TablaCrud
       titulo="Amonestaciones"
-      columnas={["Tarjeta amarilla", "Tarjeta azul", "Tarjeta roja"]}
+      columnas={[
+        "Nombre del jugador",
+        "Número de camiseta",
+        "Equipo",
+        "Encuentro disputado",
+        "Tarjeta amarilla",
+        "Tarjeta azul",
+        "Tarjeta roja"
+      ]}
       datos={datos} // ← aquí se pasa la info del backend
     />
   );
