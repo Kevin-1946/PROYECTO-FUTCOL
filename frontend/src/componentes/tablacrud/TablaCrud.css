@@ -1,3 +1,4 @@
+/* === ESTILOS DEL CONTENEDOR GENERAL PARA CUALQUIER VISTA CRUD (ej. Jueces, Amonestaciones) === */
 .crud-contenedor {
   padding: 2rem;
   background-color: #f8fbff;
@@ -7,8 +8,11 @@
   margin: 3rem auto;
   font-family: 'Segoe UI', sans-serif;
   border: 1px solid #dde8f3;
+  position: relative;
+  min-height: 600px;
 }
 
+/* === TÍTULO DE LA SECCIÓN CRUD (Ej. Jueces Disponibles, Amonestaciones) === */
 .crud-contenedor h2 {
   font-size: 1.8rem;
   text-align: center;
@@ -17,14 +21,16 @@
   font-weight: 700;
 }
 
+/* === FORMULARIO DE AGREGAR REGISTROS (vista Jueces o Amonestaciones) === */
 .crud-formulario {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: wrap; /* Permite que los inputs bajen a otra línea */
   gap: 1rem;
   justify-content: center;
   margin-bottom: 2rem;
 }
 
+/* === CAMPOS INPUT DEL FORMULARIO === */
 .crud-formulario input {
   padding: 0.7rem 1rem;
   border: 1px solid #b0bec5;
@@ -41,6 +47,7 @@
   background-color: #f0f8ff;
 }
 
+/* === BOTÓN AGREGAR DEL FORMULARIO === */
 .crud-formulario button {
   padding: 0.75rem 1.5rem;
   background-color: #ff7043; /* Coral */
@@ -51,12 +58,14 @@
   cursor: pointer;
   font-weight: 500;
   transition: background-color 0.3s ease;
+  align-self: center; /* Centra el botón verticalmente con los inputs */
 }
 
 .crud-formulario button:hover {
-  background-color: #e64a19; /* Más intenso al pasar el mouse */
+  background-color: #e64a19;
 }
 
+/* === TABLA DONDE SE LISTAN LOS DATOS === */
 .crud-tabla {
   width: 100%;
   border-collapse: collapse;
@@ -86,26 +95,22 @@
   transition: background-color 0.3s ease;
 }
 
-.crud-contenedor {
-  position: relative;
-  min-height: 600px;
-  /* ya tienes otros estilos aquí */
-}
-
+/* === ESCONDER TABLA CUANDO NO HAY DATOS === */
 .crud-tabla tbody:empty {
   display: none;
 }
 
+/* === FONDOS DE LOGO (IMAGEN MARCA DE AGUA) === */
 .logo-fondo {
   position: absolute;
   inset: 0;
-  z-index: 0; /* Aumentamos el z-index */
+  z-index: 0;
   pointer-events: none;
 }
 
 .crud-contenedor > *:not(.logo-fondo) {
   position: relative;
-  z-index: 1; /* Aseguramos que el contenido esté por encima */
+  z-index: 1;
 }
 
 .logo-small {
@@ -116,7 +121,6 @@
   object-fit: contain;
 }
 
-/* Posiciones desordenadas */
 .logo1 {
   top: 50%;
   left: 50%;

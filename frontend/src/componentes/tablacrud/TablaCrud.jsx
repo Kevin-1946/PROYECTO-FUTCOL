@@ -1,32 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './TablaCrud.css';
 import logo1 from "../../assets/imagenes/logo1.png";
+import axios from 'axios'; // Asegúrate de tener axios instalado
 
-// Acepta datos externos (props.datos) y también puede funcionar internamente
-const TablaCrud = ({ titulo, columnas, datos: datosExternos = [] }) => {
-  // Estado local para formulario
+const TablaCrud = ({ titulo, columnas, datos: datosExternos = [], endpoint = null }) => {
   const [form, setForm] = useState({});
-  // Estado local solo si no se reciben datos por props
   const [datosLocales, setDatosLocales] = useState([]);
+  const [datosApi, setDatosApi] = useState([]);
 
-  // Determina si usamos datos del padre o del estado local
-  const datos = datosExternos.length > 0 ? datosExternos : datosLocales;
+  // Cargar datos desde endpoint si se proporciona
+  useEffect(() => {
+    if (endpoint) {
+      axios.get(`http://localhost:8000/api${endpoint}`) // Ajusta si tu backend tiene otro dominio/puerto
+        .then((res) => setDatosApi(res.data))
+        .catch((err) => console.error("Error al cargar datos:", err));
+    }
+  }, [endpoint]);
 
-  // Manejador de cambio de input
+  const datos = endpoint ? datosApi : (datosExternos.length > 0 ? datosExternos : datosLocales);
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Manejador de envío de formulario (solo agrega a estado local)
   const handleSubmit = (e) => {
     e.preventDefault();
-    setDatosLocales([...datosLocales, form]); // Agrega a los datos locales
-    setForm({}); // Limpia formulario
+    setDatosLocales([...datosLocales, form]);
+    setForm({});
   };
 
   return (
     <div className="crud-contenedor">
-      {/* Fondo decorativo con logos */}
       <div className="logo-fondo">
         {[...Array(5)].map((_, i) => (
           <img key={i} src={logo1} alt="Logo" className={`logo-small logo${i + 1}`} />
@@ -35,23 +39,23 @@ const TablaCrud = ({ titulo, columnas, datos: datosExternos = [] }) => {
 
       <h2>{titulo}</h2>
 
-      {/* Formulario de ingreso de datos */}
-      <form onSubmit={handleSubmit} className="crud-formulario">
-        {columnas.map((col) => (
-          <input
-            key={col}
-            type="text"
-            name={col}
-            placeholder={col}
-            value={form[col] || ''}
-            onChange={handleChange}
-            required
-          />
-        ))}
-        <button type="submit">Agregar</button>
-      </form>
+      {!endpoint && (
+        <form onSubmit={handleSubmit} className="crud-formulario">
+          {columnas.map((col) => (
+            <input
+              key={col}
+              type="text"
+              name={col}
+              placeholder={col}
+              value={form[col] || ''}
+              onChange={handleChange}
+              required
+            />
+          ))}
+          <button type="submit">Agregar</button>
+        </form>
+      )}
 
-      {/* Tabla de datos */}
       <table className="crud-tabla">
         <thead>
           <tr>
@@ -61,15 +65,24 @@ const TablaCrud = ({ titulo, columnas, datos: datosExternos = [] }) => {
           </tr>
         </thead>
         <tbody>
-          {datos.map((fila, index) => (
-            <tr key={index}>
-              {columnas.map((col) => (
-                <td key={col}>{fila[col]}</td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+            {console.log(datos)} {/* Esto es solo para depuración */}
+            {Array.isArray(datos) && datos.length > 0 ? (
+              datos.map((fila, index) => (
+                <tr key={index}>
+                {columnas.map((col) => (
+                <td key={col}>{fila[col] || '—'}</td>
+                    ))}
+              </tr>
+                    ))
+                    ) : (
+                <tr>
+                  <td colSpan={columnas.length}>No hay datos disponibles</td>
+                </tr>
+              )}
+            </tbody>
+
+
+          </table>
     </div>
   );
 };

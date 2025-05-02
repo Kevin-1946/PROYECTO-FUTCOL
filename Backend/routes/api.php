@@ -8,7 +8,7 @@ use App\Http\Controllers\Api\EncuentrosController;
 use App\Http\Controllers\Api\InscripcionController;
 use App\Http\Controllers\Api\EquipoController;
 use App\Http\Controllers\Api\ResultadoController;
-use App\Http\Controllers\Api\JuezController;
+use App\Http\Controllers\Api\ProgramacionJuezController;
 use App\Http\Controllers\Api\JugadorController;
 use App\Http\Controllers\Api\ReciboDePagoController;
 use App\Http\Controllers\Api\AmonestacionController;
@@ -101,17 +101,17 @@ Route::patch('/resultados/{id}',[ResultadoController::class, 'updatePartial']);
 
 // ruta juez
 
-Route::get('/jueces',[JuezController::class, 'index']);
+Route::get('/jueces', [ProgramacionJuezController::class, 'index']);
 
-Route::get('/jueces/{id}',[JuezController::class, 'show']);
+Route::get('/jueces/{id}', [ProgramacionJuezController::class, 'show']);
 
-Route::post('/jueces',[JuezController::class, 'store']);
+Route::post('/jueces', [ProgramacionJuezController::class, 'store']);
 
-Route::put('/jueces/{id}',[JuezController::class, 'update']);
+Route::put('/jueces/{id}', [ProgramacionJuezController::class, 'update']);
 
-Route::delete('/jueces/{id}',[JuezController::class, 'destroy']);
+Route::delete('/jueces/{id}', [ProgramacionJuezController::class, 'destroy']);
 
-Route::patch('/jueces/{id}',[JuezController::class, 'updatePartial']);
+Route::patch('/jueces/{id}', [ProgramacionJuezController::class, 'updatePartial']);
 
 // ruta jugador
 

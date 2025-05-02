@@ -16,20 +16,29 @@ const Amonestacion = () => {
   const cargarDatos = async () => {
     try {
       const response = await getAmonestaciones();
-      const datosFormateados = response.data.map(item => ({
-        "Nombre del jugador": item.nombre_jugador,
-        "Número de camiseta": item.numero_camiseta,
-        "Equipo": item.equipo,
-        "Encuentro disputado": item.encuentro_disputado,
-        "Tarjeta amarilla": item.tarjeta_amarilla,
-        "Tarjeta azul": item.tarjeta_azul,
-        "Tarjeta roja": item.tarjeta_roja,
-      }));
-      setDatos(datosFormateados);
+      console.log(response.data); // Depuración adicional
+  
+      // Verificar si la respuesta es un array
+      if (Array.isArray(response.data)) {
+        const datosFormateados = response.data.map(item => ({
+          "Nombre del jugador": item.nombre_jugador,
+          "Número de camiseta": item.numero_camiseta,
+          "Equipo que juega": item.equipo,
+          "Encuentro disputado": item.encuentro_disputado,
+          "Tarjeta amarilla": item.tarjeta_amarilla,
+          "Tarjeta azul": item.tarjeta_azul,
+          "Tarjeta roja": item.tarjeta_roja,
+        }));
+        setDatos(datosFormateados);
+      } else {
+        console.warn("No se recibieron amonestaciones:", response.data.message);
+        setDatos([]); // Vaciar si no hay datos válidos
+      }
+  
     } catch (error) {
       console.error("Error al obtener amonestaciones:", error);
     }
-  };
+  };  
 
   return (
     <TablaCrud
@@ -37,7 +46,7 @@ const Amonestacion = () => {
       columnas={[
         "Nombre del jugador",
         "Número de camiseta",
-        "Equipo",
+        "Equipo que juega",
         "Encuentro disputado",
         "Tarjeta amarilla",
         "Tarjeta azul",

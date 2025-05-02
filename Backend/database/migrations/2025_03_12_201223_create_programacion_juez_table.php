@@ -10,10 +10,15 @@ return new class extends Migration {
         Schema::create('programacion_juez', function (Blueprint $table) {
             $table->id();
 
-            // RELACIÓN CORRECTA CON LA TABLA encuentros
-            $table->foreignId('encuentros_id')  // esto crea unsignedBigInteger + foreign key automáticamente
-                  ->constrained('encuentros')   // nombre exacto de la tabla referenciada
-                  ->onDelete('cascade');        // para eliminar en cascada
+            // Relación con la tabla encuentros
+            $table->foreignId('encuentros_id')
+                  ->constrained('encuentros')
+                  ->onDelete('cascade');
+
+           
+            $table->string('nombre');
+            $table->string('numero_de_contacto');
+            $table->string('sede');
 
             $table->timestamps();
         });

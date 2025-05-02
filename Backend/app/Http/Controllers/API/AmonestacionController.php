@@ -13,11 +13,9 @@ class AmonestacionController extends Controller
     {
         $amonestaciones = Amonestacion::all();
 
+        // Asegurarse de devolver siempre un array vacío si no se encuentran amonestaciones
         if ($amonestaciones->isEmpty()) {
-            return response()->json([
-                'message' => 'No se encontraron amonestaciones',
-                'status' => 200
-            ], 200);
+            return response()->json([], 200); // Aquí devolvemos un array vacío
         }
 
         return response()->json($amonestaciones, 200);

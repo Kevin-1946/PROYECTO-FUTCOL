@@ -6,7 +6,7 @@ const Equipos = () => {
   const columnas = ["Nombre de equipo", "N° de jugadores"];
 
   return (
-    <TablaCrud titulo="Equipos Suscritos" columnas={columnas} />
+    <TablaCrud titulo="Equipos Participantes" columnas={columnas} />
   );
 };
 
