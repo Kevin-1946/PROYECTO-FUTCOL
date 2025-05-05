@@ -3,12 +3,17 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import fondo_login from "../../assets/imagenes/fondo_login.png";
-import "../../index.css"; // Estilos personalizados
+import "../../index.css";
 
 const LoginParticipante = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetMessage, setResetMessage] = useState("");
+  const [resetError, setResetError] = useState("");
+  const [isSendingReset, setIsSendingReset] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -21,7 +26,7 @@ const LoginParticipante = () => {
       });
 
       if (response.data.access_token) {
-        localStorage.setItem("token", response.data.access_token); // opcional, si quieres guardar token
+        localStorage.setItem("token", response.data.access_token);
         alert("Inicio de sesión exitoso");
         navigate("/"); 
       } else {
@@ -34,6 +39,34 @@ const LoginParticipante = () => {
       } else {
         setError("Ocurrió un error al iniciar sesión");
       }
+    }
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setIsSendingReset(true);
+    setResetError("");
+    setResetMessage("");
+
+    try {
+      const response = await axios.post("http://localhost:8000/api/auth/forgot-password", {
+        email: resetEmail,
+      });
+
+      if (response.data.message) {
+        setResetMessage(response.data.message);
+        setResetEmail("");
+        setShowForgotPassword(false);
+      }
+    } catch (err) {
+      console.error(err);
+      if (err.response && err.response.data.message) {
+        setResetError(err.response.data.message);
+      } else {
+        setResetError("Ocurrió un error al solicitar el restablecimiento");
+      }
+    } finally {
+      setIsSendingReset(false);
     }
   };
 
@@ -78,45 +111,93 @@ const LoginParticipante = () => {
               maxWidth: "400px",
             }}
           >
-            <h2 className="text-center mb-4">Iniciar Sesión</h2>
-            {error && <div className="alert alert-danger">{error}</div>}
+            {!showForgotPassword ? (
+              <>
+                <h2 className="text-center mb-4">Iniciar Sesión</h2>
+                {error && <div className="alert alert-danger">{error}</div>}
+                {resetMessage && <div className="alert alert-success">{resetMessage}</div>}
 
-            <form onSubmit={handleSubmit}>
-              <div className="form-group mb-3">
-                <label>Email:</label>
-                <input
-                  type="email"
-                  className="form-control"
-                  placeholder="Ingrese su email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="form-group mb-3">
-                <label>Contraseña:</label>
-                <input
-                  type="password"
-                  className="form-control"
-                  placeholder="Ingrese su contraseña"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-              <button type="submit" className="btn btn-primary w-100">
-                Iniciar Sesión
-              </button>
-            </form>
+                <form onSubmit={handleSubmit}>
+                  <div className="form-group mb-3">
+                    <label>Email:</label>
+                    <input
+                      type="email"
+                      className="form-control"
+                      placeholder="Ingrese su email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="form-group mb-3">
+                    <label>Contraseña:</label>
+                    <input
+                      type="password"
+                      className="form-control"
+                      placeholder="Ingrese su contraseña"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <button type="submit" className="btn btn-primary w-100">
+                    Iniciar Sesión
+                  </button>
+                </form>
 
-            <div className="form-footer mt-3 text-center">
-              <p>
-                ¿No tienes cuenta?{" "}
-                <Link to="/suscribirse" className="text-info">
-                  Regístrate aquí
-                </Link>
-              </p>
-            </div>
+                <div className="form-footer mt-3 text-center">
+                  <p>
+                    <button 
+                      className="btn btn-link text-info p-0"
+                      onClick={() => setShowForgotPassword(true)}
+                    >
+                      ¿Olvidaste tu contraseña?
+                    </button>
+                  </p>
+                  <p>
+                    ¿No tienes cuenta?{" "}
+                    <Link to="/suscribirse" className="text-info">
+                      Regístrate aquí
+                    </Link>
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 className="text-center mb-4">Recuperar Contraseña</h2>
+                {resetError && <div className="alert alert-danger">{resetError}</div>}
+
+                <form onSubmit={handleForgotPassword}>
+                  <div className="form-group mb-3">
+                    <label>Ingresa tu email:</label>
+                    <input
+                      type="email"
+                      className="form-control"
+                      placeholder="Email registrado"
+                      value={resetEmail}
+                      onChange={(e) => setResetEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <button 
+                    type="submit" 
+                    className="btn btn-primary w-100"
+                    disabled={isSendingReset}
+                  >
+                    {isSendingReset ? 'Enviando...' : 'Enviar Instrucciones'}
+                  </button>
+                </form>
+
+                <div className="form-footer mt-3 text-center">
+                  <button 
+                    className="btn btn-link text-info"
+                    onClick={() => setShowForgotPassword(false)}
+                  >
+                    Volver al inicio de sesión
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

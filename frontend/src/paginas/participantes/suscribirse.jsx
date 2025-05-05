@@ -22,15 +22,93 @@ const Suscribirse = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({
+    nombres: "",
+    apellidos: "",
+    numero_documento: "",
+    edad: ""
+  });
+
+  const handleTextChange = (e) => {
+    const { name, value } = e.target;
+    // Validación para campos de solo texto (nombres y apellidos)
+    if (name === 'nombres' || name === 'apellidos') {
+      if (/^[A-Za-zÁáÉéÍíÓóÚúÜüÑñ\s]*$/.test(value)) {
+        setFormData({ ...formData, [name]: value });
+        setFieldErrors({ ...fieldErrors, [name]: "" });
+      } else {
+        setFieldErrors({ ...fieldErrors, [name]: "Solo se permiten letras" });
+      }
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
+  const handleNumberChange = (e) => {
+    const { name, value } = e.target;
+    // Validación para campos de solo números (documento y edad)
+    if (name === 'numero_documento' || name === 'edad') {
+      if (/^\d*$/.test(value)) {
+        setFormData({ ...formData, [name]: value });
+        setFieldErrors({ ...fieldErrors, [name]: "" });
+      } else {
+        setFieldErrors({ ...fieldErrors, [name]: "Solo se permiten números" });
+      }
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    // Determinar qué tipo de handler usar según el campo
+    if (name === 'nombres' || name === 'apellidos') {
+      handleTextChange(e);
+    } else if (name === 'numero_documento' || name === 'edad') {
+      handleNumberChange(e);
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
+
+    // Validar campos antes de enviar
+    let hasErrors = false;
+    const newFieldErrors = { ...fieldErrors };
+
+    // Validar campos de texto
+    if (!/^[A-Za-zÁáÉéÍíÓóÚúÜüÑñ\s]+$/.test(formData.nombres)) {
+      newFieldErrors.nombres = "Solo se permiten letras";
+      hasErrors = true;
+    }
+
+    if (!/^[A-Za-zÁáÉéÍíÓóÚúÜüÑñ\s]+$/.test(formData.apellidos)) {
+      newFieldErrors.apellidos = "Solo se permiten letras";
+      hasErrors = true;
+    }
+
+    // Validar campos numéricos
+    if (!/^\d+$/.test(formData.numero_documento)) {
+      newFieldErrors.numero_documento = "Solo se permiten números";
+      hasErrors = true;
+    }
+
+    if (!/^\d+$/.test(formData.edad)) {
+      newFieldErrors.edad = "Solo se permiten números";
+      hasErrors = true;
+    }
+
+    setFieldErrors(newFieldErrors);
+
+    if (hasErrors) {
+      setIsSubmitting(false);
+      return;
+    }
 
     if (formData.contrasena !== formData.confirmar_contrasena) {
       setError("Las contraseñas no coinciden.");
@@ -124,6 +202,7 @@ const Suscribirse = () => {
               title="Debe contener entre 8 y 10 números"
               autoComplete="off"
             />
+            {fieldErrors.numero_documento && <div className="text-danger small">{fieldErrors.numero_documento}</div>}
           </div>
 
           {/* Género */}
@@ -157,7 +236,10 @@ const Suscribirse = () => {
               onChange={handleChange}
               required
               autoComplete="given-name"
+              pattern="[A-Za-zÁáÉéÍíÓóÚúÜüÑñ\s]+"
+              title="Solo se permiten letras"
             />
+            {fieldErrors.nombres && <div className="text-danger small">{fieldErrors.nombres}</div>}
           </div>
 
           {/* Apellidos */}
@@ -173,14 +255,17 @@ const Suscribirse = () => {
               onChange={handleChange}
               required
               autoComplete="family-name"
+              pattern="[A-Za-zÁáÉéÍíÓóÚúÜüÑñ\s]+"
+              title="Solo se permiten letras"
             />
+            {fieldErrors.apellidos && <div className="text-danger small">{fieldErrors.apellidos}</div>}
           </div>
 
           {/* Edad */}
           <div className="mb-3">
             <label htmlFor="edad">Edad</label>
             <input
-              type="number"
+              type="text"
               name="edad"
               id="edad"
               className="form-control"
@@ -191,7 +276,10 @@ const Suscribirse = () => {
               min={15}
               max={60}
               autoComplete="off"
+              pattern="\d+"
+              title="Solo se permiten números"
             />
+            {fieldErrors.edad && <div className="text-danger small">{fieldErrors.edad}</div>}
           </div>
 
           {/* Tipo de Torneo */}

@@ -3,6 +3,7 @@ import Futcol from "./paginas/inicio/futcol";
 import Torneos from "./paginas/torneos/torneos";
 import Nosotros from "./paginas/informacion/sobre_nosotros";
 import LoginParticipante from "./paginas/participantes/login_participante";
+import ResetContrasena from './paginas/participantes/reset_contrasena/reset_contrasena';
 import Suscribirse from "./paginas/participantes/suscribirse";
 
 import Amonestacion from "./paginas/torneos/amonestacion";
@@ -50,6 +51,7 @@ function App() {
         {/* Rutas de participantes */}
         <Route path="/participantes/jugador" element={<Jugador />} />
         <Route path="/participantes/juez" element={<Juez />} />
+        <Route path="/Reset_contrasena/:token" element={<ResetContrasena />} />
       </Routes>
     </>
   );

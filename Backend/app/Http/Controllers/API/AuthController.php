@@ -3,22 +3,27 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\LoginUsuario;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PasswordResetMail;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class AuthController extends Controller
 {
-    // ✅ Excluir también el método refresh del middleware
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'refresh']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'refresh', 'forgotPassword', 'resetPassword']]);
     }
 
+    // ✅ Método de registro existente
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -50,29 +55,36 @@ class AuthController extends Controller
         return response()->json(['mensaje' => 'Usuario registrado exitosamente'], 201);
     }
 
+    // ✅ Método de login mejorado
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
 
-        if (!$token = JWTAuth::attempt($credentials)) {
-            return response()->json(['error' => 'Credenciales inválidas'], 401);
-        }
+        try {
+            if (!$token = JWTAuth::attempt($credentials)) {
+                return response()->json(['error' => 'Credenciales inválidas'], 401);
+            }
 
-        return $this->respondWithToken($token);
+            return $this->respondWithToken($token);
+        } catch (JWTException $e) {
+            return response()->json(['error' => 'No se pudo crear el token'], 500);
+        }
     }
 
+    // ✅ Método de logout
     public function logout()
     {
         auth('api')->logout();
         return response()->json(['mensaje' => 'Sesión cerrada correctamente']);
     }
 
+    // ✅ Método para obtener usuario autenticado
     public function me()
     {
         return response()->json(auth('api')->user());
     }
 
-    // ✅ REFRESCAR TOKEN de forma segura
+    // ✅ Método para refrescar token
     public function refresh()
     {
         try {
@@ -83,6 +95,66 @@ class AuthController extends Controller
         } catch (JWTException $e) {
             return response()->json(['error' => 'Token no proporcionado o mal formado.'], 400);
         }
+    }
+
+    // ✅ Método para recuperación de contraseña
+    public function forgotPassword(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $user = LoginUsuario::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'Si el email existe, te enviaremos un enlace de recuperación'], 200);
+        }
+
+        // Generar token
+        $token = Str::random(60);
+        $expiresAt = Carbon::now()->addHours(1);
+
+        // Guardar token en la base de datos
+        DB::table('password_resets')->updateOrInsert(
+            ['email' => $user->email],
+            [
+                'token' => Hash::make($token),
+                'created_at' => now()
+            ]
+        );
+
+        // Enviar email
+        $resetLink = url(config('app.url') . '/reset-password?token=' . $token . '&email=' . urlencode($user->email));
+        
+        Mail::to($user->email)->send(new PasswordResetMail($resetLink));
+
+        return response()->json(['message' => 'Si el email existe, te enviaremos un enlace de recuperación']);
+    }
+
+    // ✅ Método para restablecer contraseña
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        $resetRecord = DB::table('password_resets')
+            ->where('email', $request->email)
+            ->first();
+
+        if (!$resetRecord || !Hash::check($request->token, $resetRecord->token)) {
+            return response()->json(['error' => 'Token inválido o expirado'], 400);
+        }
+
+        // Actualizar contraseña
+        $user = LoginUsuario::where('email', $request->email)->first();
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        // Eliminar token
+        DB::table('password_resets')->where('email', $request->email)->delete();
+
+        return response()->json(['message' => 'Contraseña actualizada correctamente']);
     }
 
     protected function respondWithToken($token)

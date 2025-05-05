@@ -28,6 +28,10 @@ class LoginUsuario extends Authenticatable implements JWTSubject
         'remember_token',
     ];
 
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
     public $timestamps = true;
 
     // JWT
