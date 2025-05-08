@@ -1,0 +1,7 @@
+/* src/componentes/AmonestacionCrud/AmonestacionCrud.css */
+
+.tabla-amonestaciones {
+    margin: 2rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+  }  

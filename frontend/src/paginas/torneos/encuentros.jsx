@@ -1,5 +1,5 @@
 import React from "react";
-import EncuentroCrud from "../../componentes/encuentroCrud/EncuentroCrud";
+import EncuentroCrud from "../../componentes/EncuentroCrud/EncuentroCrud";
 
 const Encuentros = () => <EncuentroCrud />;
 

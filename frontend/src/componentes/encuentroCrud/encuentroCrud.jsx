@@ -4,8 +4,8 @@ import {
   createEncuentro,
   updateEncuentro,
   deleteEncuentro,
-} from "../../api/encuentrosService";
-import "./encuentroCrud.css";
+} from "../../api/EncuentrosService";
+import "./EncuentroCrud.css";
 
 const EncuentroCrud = () => {
   const [encuentros, setEncuentros] = useState([]);
@@ -18,54 +18,71 @@ const EncuentroCrud = () => {
   });
   const [editandoId, setEditandoId] = useState(null);
 
+  // Cargar los encuentros al montar el componente
   const cargarDatos = async () => {
     try {
       const res = await getEncuentros();
-  
-      // Aquí accedemos a los datos reales según el backend
+
+      // Verifica si es un array o viene envuelto en data
       const data = Array.isArray(res.data) ? res.data : res.data.data;
-  
+
       setEncuentros(data || []);
     } catch (error) {
       console.error("Error al cargar los encuentros:", error);
       setEncuentros([]);
     }
-  };  
+  };
 
   useEffect(() => {
     cargarDatos();
   }, []);
 
+  // Maneja cambios en los inputs del formulario
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Guardar o actualizar un encuentro
   const handleSubmit = async () => {
     try {
+      // Asegurar que la hora esté en formato H:i:s agregando ":00" si falta
+      const horaFormateada = form.hora.length === 5 ? `${form.hora}:00` : form.hora;
+
+      // Crear objeto con datos formateados
+      const datos = {
+        ...form,
+        hora: horaFormateada,
+      };
+
+      // Crear o actualizar según el estado
       if (editandoId) {
-        await updateEncuentro(editandoId, form);
+        await updateEncuentro(editandoId, datos);
       } else {
-        await createEncuentro(form);
+        await createEncuentro(datos);
       }
+
+      // Limpiar formulario y recargar datos
       setForm({ sede: "", fecha: "", hora: "", local: "", visitante: "" });
       setEditandoId(null);
       await cargarDatos();
     } catch (error) {
-      console.error("Error al guardar el encuentro:", error);
+      console.error("Error al guardar el encuentro:", error.response?.data || error.message);
     }
   };
 
+  // Cargar datos del encuentro en el formulario para editar
   const handleEditar = (encuentro) => {
     setForm({
       sede: encuentro.sede,
       fecha: encuentro.fecha,
-      hora: encuentro.hora,
+      hora: encuentro.hora.slice(0, 5), // Mostrar solo HH:mm
       local: encuentro.local,
       visitante: encuentro.visitante,
     });
     setEditandoId(encuentro.id);
   };
 
+  // Eliminar un encuentro
   const handleEliminar = async (id) => {
     try {
       await deleteEncuentro(id);
