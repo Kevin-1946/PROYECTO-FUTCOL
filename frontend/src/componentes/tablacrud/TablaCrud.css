@@ -60,7 +60,7 @@ h2 {
 
 .crud-formulario button {
   padding: 0.5rem 1rem;
-  background-color: #3f51b5;
+  background-color: #2e86de;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -70,7 +70,7 @@ h2 {
 }
 
 .crud-formulario button:hover {
-  background-color: #303f9f;
+  background-color: #2e86de;
 }
 
 /* Tabla */
@@ -83,7 +83,7 @@ h2 {
 }
 
 .crud-tabla thead {
-  background-color: #3f51b5;
+  background-color: #2e86de;
   color: white;
 }
 

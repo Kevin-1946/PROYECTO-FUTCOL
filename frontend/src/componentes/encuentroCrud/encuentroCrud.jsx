@@ -4,8 +4,8 @@ import {
   createEncuentro,
   updateEncuentro,
   deleteEncuentro,
-} from "../../services/encuentroService";
-import "./EncuentroCrud.css";
+} from "../../api/encuentrosService";
+import "./encuentroCrud.css";
 
 const EncuentroCrud = () => {
   const [encuentros, setEncuentros] = useState([]);
@@ -19,9 +19,18 @@ const EncuentroCrud = () => {
   const [editandoId, setEditandoId] = useState(null);
 
   const cargarDatos = async () => {
-    const res = await getEncuentros();
-    setEncuentros(res.data);
-  };
+    try {
+      const res = await getEncuentros();
+  
+      // Aquí accedemos a los datos reales según el backend
+      const data = Array.isArray(res.data) ? res.data : res.data.data;
+  
+      setEncuentros(data || []);
+    } catch (error) {
+      console.error("Error al cargar los encuentros:", error);
+      setEncuentros([]);
+    }
+  };  
 
   useEffect(() => {
     cargarDatos();
@@ -32,29 +41,43 @@ const EncuentroCrud = () => {
   };
 
   const handleSubmit = async () => {
-    if (editandoId) {
-      await updateEncuentro(editandoId, form);
-    } else {
-      await createEncuentro(form);
+    try {
+      if (editandoId) {
+        await updateEncuentro(editandoId, form);
+      } else {
+        await createEncuentro(form);
+      }
+      setForm({ sede: "", fecha: "", hora: "", local: "", visitante: "" });
+      setEditandoId(null);
+      await cargarDatos();
+    } catch (error) {
+      console.error("Error al guardar el encuentro:", error);
     }
-    setForm({ sede: "", fecha: "", hora: "", local: "", visitante: "" });
-    setEditandoId(null);
-    await cargarDatos();
   };
 
   const handleEditar = (encuentro) => {
-    setForm(encuentro);
+    setForm({
+      sede: encuentro.sede,
+      fecha: encuentro.fecha,
+      hora: encuentro.hora,
+      local: encuentro.local,
+      visitante: encuentro.visitante,
+    });
     setEditandoId(encuentro.id);
   };
 
   const handleEliminar = async (id) => {
-    await deleteEncuentro(id);
-    await cargarDatos();
+    try {
+      await deleteEncuentro(id);
+      await cargarDatos();
+    } catch (error) {
+      console.error("Error al eliminar el encuentro:", error);
+    }
   };
 
   return (
     <div className="encuentro-crud">
-      <h2>Gestión de Encuentros</h2>
+      <h2>Encuentros</h2>
       <div className="formulario">
         <input name="sede" placeholder="Sede" value={form.sede} onChange={handleChange} />
         <input type="date" name="fecha" value={form.fecha} onChange={handleChange} />
