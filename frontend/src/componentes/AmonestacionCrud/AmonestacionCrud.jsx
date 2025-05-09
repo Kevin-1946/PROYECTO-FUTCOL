@@ -1,135 +1,209 @@
+// AmonestacionCrud.jsx
 import React, { useEffect, useState } from "react";
-import TablaCrud from "../tablacrud/TablaCrud"; // ajusta si cambia de ubicación
 import {
   getAmonestaciones,
   createAmonestacion,
   updateAmonestacion,
   deleteAmonestacion,
 } from "../../api/amonestacionService";
-import "./AmonestacionCrud.css"; // Estilos opcionales
+import "./AmonestacionCrud.css";
 
 const AmonestacionCrud = () => {
   const [datos, setDatos] = useState([]);
+  const [editandoId, setEditandoId] = useState(null);
+  const [nuevo, setNuevo] = useState({
+    nombre: "",
+    camiseta: "",
+    equipo: "",
+    encuentro: "",
+    amarilla: "",
+    azul: "",
+    roja: "",
+  });
+  const [errores, setErrores] = useState({});
 
-  // Cargar los datos iniciales al montar el componente
   useEffect(() => {
     cargarDatos();
   }, []);
 
-  // Función para cargar las amonestaciones desde el backend
   const cargarDatos = async () => {
     try {
       const response = await getAmonestaciones();
-
-      // Verifica si la respuesta contiene un arreglo
       if (Array.isArray(response.data)) {
-        const datosFormateados = response.data.map(item => ({
+        const datosFormateados = response.data.map((item) => ({
           id: item.id,
-          "Nombre del jugador": item.nombre_jugador,
-          "Número de camiseta": item.numero_camiseta,
-          "Equipo que juega": item.equipo,
-          "Encuentro disputado": item.encuentro_disputado,
-          "Tarjeta amarilla": item.tarjeta_amarilla,
-          "Tarjeta azul": item.tarjeta_azul,
-          "Tarjeta roja": item.tarjeta_roja,
+          nombre: item.nombre_jugador,
+          camiseta: item.numero_camiseta,
+          equipo: item.equipo,
+          encuentro: item.encuentro_disputado,
+          amarilla: item.tarjeta_amarilla,
+          azul: item.tarjeta_azul,
+          roja: item.tarjeta_roja,
         }));
-        setDatos(datosFormateados); // Actualiza el estado con los datos
+        setDatos(datosFormateados);
       } else {
-        setDatos([]); // Si no es un arreglo, vacía los datos
+        setDatos([]);
       }
     } catch (error) {
-      console.error("Error al obtener amonestaciones:", error); // Error al obtener datos
+      console.error("Error al obtener amonestaciones:", error);
     }
   };
 
-  // Función para manejar la creación de una nueva amonestación
-  const manejarCrear = async (nuevo) => {
+  const validarCampos = () => {
+    const nuevosErrores = {};
+    const nombreRegex = /^[A-Za-z\s]+$/;
+    const numeroRegex = /^\d{1,2}$/;
+    const equipoRegex = /^[A-Za-z0-9\s]+$/;
+    const tarjetaRegex = /^\d{1,2}$/;
+
+    if (!nuevo.nombre || !nombreRegex.test(nuevo.nombre)) {
+      nuevosErrores.nombre = "Solo letras";
+    }
+
+    if (!nuevo.camiseta || !numeroRegex.test(nuevo.camiseta)) {
+      nuevosErrores.camiseta = "Solo números (máx. 2 cifras)";
+    }
+
+    if (!nuevo.equipo || !equipoRegex.test(nuevo.equipo)) {
+      nuevosErrores.equipo = "Sin símbolos especiales";
+    }
+
+    if (!nuevo.encuentro) {
+      nuevosErrores.encuentro = "Campo requerido";
+    }
+
+    if (
+      (!nuevo.amarilla || !tarjetaRegex.test(nuevo.amarilla)) &&
+      (!nuevo.azul || !tarjetaRegex.test(nuevo.azul)) &&
+      (!nuevo.roja || !tarjetaRegex.test(nuevo.roja))
+    ) {
+      nuevosErrores.amarilla = "Al menos una tarjeta mayor a 0";
+      nuevosErrores.azul = "Al menos una tarjeta mayor a 0";
+      nuevosErrores.roja = "Al menos una tarjeta mayor a 0";
+    }
+
+    setErrores(nuevosErrores);
+    return Object.keys(nuevosErrores).length === 0;
+  };
+
+  const manejarCrear = async () => {
+    if (!validarCampos()) return;
+
+    const dataParaEnviar = {
+      nombre_jugador: nuevo.nombre,
+      numero_camiseta: parseInt(nuevo.camiseta),
+      equipo: nuevo.equipo,
+      encuentro_disputado: nuevo.encuentro,
+      tarjeta_amarilla: parseInt(nuevo.amarilla) || 0,
+      tarjeta_azul: parseInt(nuevo.azul) || 0,
+      tarjeta_roja: parseInt(nuevo.roja) || 0,
+    };
+
     try {
-      // Aseguramos que los valores sean números y no NaN (usando || 0)
-      const dataParaEnviar = {
-        nombre_jugador: nuevo["Nombre del jugador"],
-        numero_camiseta: parseInt(nuevo["Número de camiseta"]) || 0, // Asegura que sea un número
-        equipo: nuevo["Equipo que juega"],
-        encuentro_disputado: nuevo["Encuentro disputado"],
-        tarjeta_amarilla: parseInt(nuevo["Tarjeta amarilla"]) || 0, // Valor predeterminado 0 si no es un número
-        tarjeta_azul: parseInt(nuevo["Tarjeta azul"]) || 0,
-        tarjeta_roja: parseInt(nuevo["Tarjeta roja"]) || 0,
-      };
-
-      // Validación adicional para asegurarse de que las tarjetas no sean NaN
-      if (isNaN(dataParaEnviar.tarjeta_amarilla) ||
-          isNaN(dataParaEnviar.tarjeta_azul) ||
-          isNaN(dataParaEnviar.tarjeta_roja)) {
-        console.error("Algunos valores de tarjetas no son válidos.");
-        return; // No enviaremos los datos si hay algún NaN
+      if (editandoId) {
+        await updateAmonestacion(editandoId, dataParaEnviar);
+      } else {
+        await createAmonestacion(dataParaEnviar);
       }
 
-      await createAmonestacion(dataParaEnviar); // Llamamos a la función para crear la amonestación
-      await cargarDatos(); // Recargamos los datos después de la creación
+      setNuevo({
+        nombre: "",
+        camiseta: "",
+        equipo: "",
+        encuentro: "",
+        amarilla: "",
+        azul: "",
+        roja: "",
+      });
+      setEditandoId(null);
+      setErrores({});
+      await cargarDatos();
     } catch (error) {
-      // En caso de error, mostramos el mensaje en consola
-      console.error("Error creando amonestación:", error.response?.data || error.message);
+      console.error("Error al guardar:", error.response?.data || error.message);
     }
   };
 
-  // Función para manejar la edición de una amonestación existente
-  const manejarEditar = async (id, actualizado) => {
-    try {
-      // Aseguramos que los valores sean números y no NaN (usando || 0)
-      const dataParaEnviar = {
-        nombre_jugador: actualizado["Nombre del jugador"],
-        numero_camiseta: parseInt(actualizado["Número de camiseta"]) || 0,
-        equipo: actualizado["Equipo que juega"],
-        encuentro_disputado: actualizado["Encuentro disputado"],
-        tarjeta_amarilla: parseInt(actualizado["Tarjeta amarilla"]) || 0,
-        tarjeta_azul: parseInt(actualizado["Tarjeta azul"]) || 0,
-        tarjeta_roja: parseInt(actualizado["Tarjeta roja"]) || 0,
-      };
-
-      // Validación adicional para asegurarse de que las tarjetas no sean NaN
-      if (isNaN(dataParaEnviar.tarjeta_amarilla) ||
-          isNaN(dataParaEnviar.tarjeta_azul) ||
-          isNaN(dataParaEnviar.tarjeta_roja)) {
-        console.error("Algunos valores de tarjetas no son válidos.");
-        return; // No enviaremos los datos si hay algún NaN
-      }
-
-      await updateAmonestacion(id, dataParaEnviar); // Llamamos a la función para actualizar la amonestación
-      await cargarDatos(); // Recargamos los datos después de la actualización
-    } catch (error) {
-      // En caso de error, mostramos el mensaje en consola
-      console.error("Error actualizando amonestación:", error.response?.data || error.message);
-    }
+  const manejarEditar = (item) => {
+    setNuevo({
+      nombre: item.nombre,
+      camiseta: item.camiseta,
+      equipo: item.equipo,
+      encuentro: item.encuentro,
+      amarilla: item.amarilla,
+      azul: item.azul,
+      roja: item.roja,
+    });
+    setEditandoId(item.id);
+    setErrores({});
   };
 
-  // Función para manejar la eliminación de una amonestación
   const manejarEliminar = async (id) => {
     try {
-      await deleteAmonestacion(id); // Llamamos a la función para eliminar la amonestación
-      await cargarDatos(); // Recargamos los datos después de la eliminación
+      await deleteAmonestacion(id);
+      await cargarDatos();
     } catch (error) {
-      // En caso de error, mostramos el mensaje en consola
       console.error("Error eliminando amonestación:", error);
     }
   };
 
+  const handleInputChange = (e, campo) => {
+    const valor = e.target.value;
+    // Validaciones en tiempo real (opcional)
+    setNuevo({ ...nuevo, [campo]: valor });
+  };
+
   return (
-    <TablaCrud
-      titulo="Amonestaciones"
-      columnas={[
-        "Nombre del jugador",
-        "Número de camiseta",
-        "Equipo que juega",
-        "Encuentro disputado",
-        "Tarjeta amarilla",
-        "Tarjeta azul",
-        "Tarjeta roja",
-      ]}
-      datos={datos}
-      onCrear={manejarCrear}
-      onEditar={manejarEditar}
-      onEliminar={manejarEliminar}
-    />
+    <div className="amonestacion-container">
+      <h2 className="amonestacion-title">Amonestaciones</h2>
+
+      <div className="form-row">
+        {[
+          { nombre: "nombre", placeholder: "Nombre del jugador" },
+          { nombre: "camiseta", placeholder: "Número de camiseta" },
+          { nombre: "equipo", placeholder: "Equipo que juega" },
+          { nombre: "encuentro", placeholder: "Encuentro disputado" },
+          { nombre: "amarilla", placeholder: "Amarilla" },
+          { nombre: "azul", placeholder: "Azul" },
+          { nombre: "roja", placeholder: "Roja" },
+        ].map(({ nombre, placeholder }) => (
+          <div key={nombre} style={{ display: "flex", flexDirection: "column" }}>
+            <input
+              placeholder={placeholder}
+              value={nuevo[nombre]}
+              onChange={(e) => handleInputChange(e, nombre)}
+              className={`crud-input ${nombre.match(/amarilla|azul|roja/) ? "tarjeta" : ""} ${
+                errores[nombre] ? "input-error" : ""
+              }`}
+            />
+            {errores[nombre] && <span className="error-message">{errores[nombre]}</span>}
+          </div>
+        ))}
+
+        <button onClick={manejarCrear} className="crud-button edit">
+          {editandoId ? "Actualizar" : "Agregar"}
+        </button>
+      </div>
+
+      <div className="crud-cards">
+        {datos.map((item) => (
+          <div key={item.id} className="crud-card">
+            <div className="crud-fields-row">
+              <div className="crud-field"><label>Jugador</label><div>{item.nombre}</div></div>
+              <div className="crud-field"><label>Camiseta</label><div>{item.camiseta}</div></div>
+              <div className="crud-field"><label>Equipo</label><div>{item.equipo}</div></div>
+              <div className="crud-field"><label>Encuentro</label><div>{item.encuentro}</div></div>
+              <div className="crud-field"><label>Amarilla</label><div>{item.amarilla}</div></div>
+              <div className="crud-field"><label>Azul</label><div>{item.azul}</div></div>
+              <div className="crud-field"><label>Roja</label><div>{item.roja}</div></div>
+            </div>
+            <div className="crud-actions">
+              <button onClick={() => manejarEditar(item)} className="crud-button edit">Editar</button>
+              <button onClick={() => manejarEliminar(item.id)} className="crud-button delete">Eliminar</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
 

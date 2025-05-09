@@ -1,79 +1,93 @@
 .encuentro-crud {
-  max-width: 800px;
-  margin: auto;
-  padding: 20px;
-  font-family: Arial, sans-serif;
+  max-width: 1000px; /* Aumentado el ancho */
+  margin: 30px auto;
+  padding: 30px;
+  border-radius: 12px;
+  background-color: #f9f9f9;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
 }
 
-h2 {
+.encuentro-crud h2 {
   text-align: center;
   margin-bottom: 20px;
+  color: #333;
 }
 
 .formulario {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 20px;
-  justify-content: center;
+  justify-content: space-between;
 }
 
 .formulario input {
-  padding: 8px;
+  flex: 1 1 45%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 6px;
   border: 1px solid #ccc;
-  border-radius: 5px;
 }
 
 .formulario button {
-  padding: 8px 16px;
-  background-color: #2e86de;
-  color: white;
+  flex: 1 1 100%;
+  padding: 12px;
+  font-size: 16px;
+  background-color: #1f73e0;
   border: none;
-  border-radius: 5px;
+  color: white;
+  border-radius: 6px;
   cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
 }
 
-.formulario button:hover {
-  background-color: #1e70c1;
-}
-
-.tabla-encuentros {
+table {
   width: 100%;
   border-collapse: collapse;
-  text-align: center;
 }
 
-.tabla-encuentros th,
-.tabla-encuentros td {
-  border: 1px solid #ddd;
-  padding: 10px;
+th, td {
+  text-align: left;
+  padding: 14px;
+  border-bottom: 1px solid #ddd;
 }
 
-.tabla-encuentros th {
-  background-color: #f5f5f5;
-}
-
-button.editar {
-  background-color: #27ae60;
+th {
+  background-color: #1f73e0;
   color: white;
-  margin-right: 5px;
-  padding: 5px 10px;
+}
+
+td button {
+  padding: 8px 14px;
+  margin: 0 8px; /* Más separación entre botones */
   border: none;
   border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
 }
 
-button.eliminar {
-  background-color: #c0392b;
+td button:first-child {
+  background-color: #1f73e0; /* Editar */
+  color: rgb(255, 255, 255);
+}
+
+td button:last-child {
+  background-color: #f44336; /* Eliminar */
   color: white;
-  padding: 5px 10px;
-  border: none;
-  border-radius: 4px;
 }
 
-button.editar:hover {
-  background-color: #1e8449;
-}
+@media (max-width: 600px) {
+  .formulario input {
+    flex: 1 1 100%;
+  }
 
-button.eliminar:hover {
-  background-color: #922b21;
+  .formulario button {
+    flex: 1 1 100%;
+  }
+
+  td button {
+    margin: 5px 0; /* Separación vertical en móviles */
+    display: block;
+  }
 }
