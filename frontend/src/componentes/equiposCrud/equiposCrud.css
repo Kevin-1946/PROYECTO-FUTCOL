@@ -1,0 +1,119 @@
+.equipos-crud {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #f8f8f8;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.equipos-crud h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.formulario-doble {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 20px;
+}
+
+.columna {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.columna input {
+  padding: 6px 10px;
+  font-size: 13px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+button {
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.95;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button.agregar-jugador {
+  background-color: #28a745;
+  color: white;
+  align-self: start;
+}
+
+button.eliminar-jugador {
+  background-color: #f44336;
+  color: white;
+  padding: 5px 10px;
+}
+
+.error {
+  color: red;
+  font-size: 0.85rem;
+  margin-top: -8px;
+  margin-bottom: 5px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+  vertical-align: top;
+}
+
+td .equipo-nombre {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+}
+
+td .jugadores-lista {
+  margin-top: 5px;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+td .botones-acciones {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+td .botones-acciones button.editar {
+  background-color: #1f73e0;
+  color: white;
+}
+
+td .botones-acciones button.eliminar {
+  background-color: #f44336;
+  color: white;
+}
+
+.jugador-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input-error {
+  border: 1px solid red !important;
+}
