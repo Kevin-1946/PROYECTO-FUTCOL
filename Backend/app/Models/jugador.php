@@ -9,14 +9,13 @@ class jugador extends Model
 {
     use HasFactory;
 
-    // Nombre de la tabla en la base de datos (opcional si sigue la convención de Laravel)
-    protected $table = 'jugador'; 
+    protected $table = 'jugador';
 
-    // Campos que pueden ser asignados masivamente
     protected $fillable = [
-        'nombre',
-        'numero_documento',
-        'fecha_nacimiento',
-    
-    ]; 
+        'nombre_jugador',
+        'numero_camiseta',
+        'edad',
+        'nombre_equipo',
+        'goles_a_favor'
+    ];
 }

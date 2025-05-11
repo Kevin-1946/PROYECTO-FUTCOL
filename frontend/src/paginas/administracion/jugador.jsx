@@ -1,13 +1,6 @@
 import React from "react";
-import '../../componentes/tablacrud/TablaCrud.css';
-import TablaCrud from "../../componentes/tablacrud/TablaCrud";
+import JugadoresCrud from "../../componentes/JugadoresCrud/JugadoresCrud";
 
-const Jugador = () => {
-  const columnas = ["Nombre", "N° de documento", "Fecha de nacimiento"];
-
-  return (
-    <TablaCrud titulo="Jugadores" columnas={columnas} />
-  );
-};
+const Jugador = () => <JugadoresCrud />;
 
 export default Jugador;

@@ -11,56 +11,45 @@ class JugadorController extends Controller
 {
     public function index()
     {
-        $jugadores = jugador::all();
-
-        if ($jugadores->isEmpty()) {
-            $data = [
-                'message' => 'No se encontraron jugadores',
-                'status' => '200'
-            ];
-            return response()->json($data, 200);
-        }
-
-        return response()->json($jugadores, 200);
+        return response()->json(jugador::all(), 200);
     }
 
     public function store(Request $request)
     {
         $Validator = Validator::make($request->all(), [
-            'nombre' => 'required|max:100',
-            'numero_documento' => 'required|unique:jugador',
-            'fecha_nacimiento' => 'required|date',
+            'nombre_jugador' => [
+                'required',
+                'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ]+(?:\s+[A-Za-zÁÉÍÓÚáéíóúÑñ]+)+$/',
+                'unique:jugador,nombre_jugador',
+                'max:100'
+            ],
+            'numero_camiseta' => 'required|integer|between:0,99',
+            'edad' => 'required|integer|between:15,60',
+            'nombre_equipo' => 'required|regex:/^[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ\s]+$/|max:100',
+            'goles_a_favor' => 'required|integer|between:0,99'
         ]);
 
         if ($Validator->fails()) {
-            $data = [
+            return response()->json([
                 'message' => 'Error en la validación de los datos',
                 'errors' => $Validator->errors(),
                 'status' => 400
-            ];
-            return response()->json($data, 400);
+            ], 400);
         }
 
-        $jugador = jugador::create([
-            'nombre' => $request->nombre,
-            'numero_documento' => $request->numero_documento,
-            'fecha_nacimiento' => $request->fecha_nacimiento,
-        ]);
+        $jugador = jugador::create($request->all());
 
         if (!$jugador) {
-            $data = [
+            return response()->json([
                 'message' => 'Error al crear el jugador',
                 'status' => 500
-            ];
-            return response()->json($data, 500);
+            ], 500);
         }
 
-        $data = [
+        return response()->json([
             'jugador' => $jugador,
             'status' => 201
-        ];
-
-        return response()->json($data, 201);
+        ], 201);
     }
 
     public function show($id)
@@ -68,11 +57,10 @@ class JugadorController extends Controller
         $jugador = jugador::find($id);
 
         if (!$jugador) {
-            $data = [
+            return response()->json([
                 'message' => 'Jugador no encontrado',
-                'status' => 400
-            ];
-            return response()->json($data, 404);
+                'status' => 404
+            ], 404);
         }
 
         return response()->json($jugador, 200);
@@ -83,103 +71,100 @@ class JugadorController extends Controller
         $jugador = jugador::find($id);
 
         if (!$jugador) {
-            $data = [
+            return response()->json([
                 'message' => 'Jugador no encontrado',
                 'status' => 404
-            ];
-            return response()->json($data, 404);
+            ], 404);
         }
 
         $jugador->delete();
-        $data = [
+
+        return response()->json([
             'message' => 'Jugador eliminado',
             'status' => 200
-        ];
-        return response()->json($data, 200);
+        ], 200);
     }
 
     public function update(Request $request, $id)
     {
         $jugador = jugador::find($id);
+
         if (!$jugador) {
-            $data = [
+            return response()->json([
                 'message' => 'Jugador no encontrado',
-                'status' => 400
-            ];
-            return response()->json($data, 404);
+                'status' => 404
+            ], 404);
         }
 
         $Validator = Validator::make($request->all(), [
-            'nombre' => 'required|max:100',
-            'numero_documento' => 'required|unique:jugador,numero_documento,' . $id,
-            'fecha_nacimiento' => 'required|date',
+            'nombre_jugador' => [
+                'required',
+                'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ]+(?:\s+[A-Za-zÁÉÍÓÚáéíóúÑñ]+)+$/',
+                'unique:jugador,nombre_jugador,' . $id,
+                'max:100'
+            ],
+            'numero_camiseta' => 'required|integer|between:0,99',
+            'edad' => 'required|integer|between:15,60',
+            'nombre_equipo' => 'required|regex:/^[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ\s]+$/|max:100',
+            'goles_a_favor' => 'required|integer|between:0,99'
         ]);
 
         if ($Validator->fails()) {
-            $data = [
+            return response()->json([
                 'message' => 'Error en la validación de los datos',
                 'errors' => $Validator->errors(),
                 'status' => 400
-            ];
-            return response()->json($data, 400);
+            ], 400);
         }
 
-        $jugador->nombre = $request->nombre;
-        $jugador->numero_documento = $request->numero_documento;
-        $jugador->fecha_nacimiento = $request->fecha_nacimiento;
-        $jugador->save();
+        $jugador->update($request->all());
 
-        $data = [
+        return response()->json([
             'message' => 'Jugador actualizado',
             'jugador' => $jugador,
             'status' => 200
-        ];
-        return response()->json($data, 200);
+        ], 200);
     }
 
     public function updatePartial(Request $request, $id)
     {
         $jugador = jugador::find($id);
+
         if (!$jugador) {
-            $data = [
+            return response()->json([
                 'message' => 'Jugador no encontrado',
                 'status' => 404
-            ];
-            return response()->json($data, 404);
+            ], 404);
         }
 
         $Validator = Validator::make($request->all(), [
-            'nombre' => 'sometimes|required|max:100',
-            'numero_documento' => 'sometimes|required|unique:jugador,numero_documento,' . $id,
-            'fecha_nacimiento' => 'sometimes|required|date',
+            'nombre_jugador' => [
+                'sometimes',
+                'required',
+                'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ]+(?:\s+[A-Za-zÁÉÍÓÚáéíóúÑñ]+)+$/',
+                'unique:jugador,nombre_jugador,' . $id,
+                'max:100'
+            ],
+            'numero_camiseta' => 'sometimes|required|integer|between:0,99',
+            'edad' => 'sometimes|required|integer|between:15,60',
+            'nombre_equipo' => 'sometimes|required|regex:/^[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ\s]+$/|max:100',
+            'goles_a_favor' => 'sometimes|required|integer|between:0,99'
         ]);
 
         if ($Validator->fails()) {
-            $data = [
+            return response()->json([
                 'message' => 'Error en la validación de los datos',
                 'errors' => $Validator->errors(),
                 'status' => 400
-            ];
-            return response()->json($data, 400);
+            ], 400);
         }
 
-        if ($request->has('nombre')) {
-            $jugador->nombre = $request->nombre;
-        }
-        if ($request->has('numero_documento')) {
-            $jugador->numero_documento = $request->numero_documento;
-        }
-        if ($request->has('fecha_nacimiento')) {
-            $jugador->fecha_nacimiento = $request->fecha_nacimiento;
-        }
+        $jugador->update($request->all());
 
-        $jugador->save();
-
-        $data = [
+        return response()->json([
             'message' => 'Jugador actualizado',
             'jugador' => $jugador,
             'status' => 200
-        ];
-        return response()->json($data, 200);
+        ], 200);
     }
 }
