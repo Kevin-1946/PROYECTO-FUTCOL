@@ -13,24 +13,31 @@ class ProgramacionJuezController extends Controller
     {
         $jueces = ProgramacionJuez::with('encuentro')->get();
 
-        if ($jueces->isEmpty()) {
-            return response()->json([
-                'message' => 'No se encontraron jueces',
-                'status' => 200
-            ], 200);
+        // Siempre retornar un array, aunque esté vacío
+        return response()->json($jueces);
+    }
+
+    private function validateData($data, $partial = false)
+    {
+        $rules = [
+            'nombre' => ['required', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ]+(?:\s[A-Za-zÁÉÍÓÚáéíóúñÑ]+)+$/', 'max:50'],
+            'numero_de_contacto' => ['required', 'regex:/^\d{7,10}$/'],
+            'sede' => ['required', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ0-9\s]+$/', 'max:100'],
+            'encuentros_id' => ['required', 'exists:encuentros,id'],
+        ];
+
+        if ($partial) {
+            foreach ($rules as $field => $ruleSet) {
+                $rules[$field] = array_merge(['sometimes'], $ruleSet);
+            }
         }
 
-        return response()->json($jueces, 200);
+        return Validator::make($data, $rules);
     }
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'nombre' => 'required|max:50',
-            'numero_de_contacto' => 'required|max:15',
-            'sede' => 'required|max:100',
-            'encuentros_id' => 'required|exists:encuentros,id'
-        ]);
+        $validator = $this->validateData($request->all());
 
         if ($validator->fails()) {
             return response()->json([
@@ -59,7 +66,7 @@ class ProgramacionJuezController extends Controller
             ], 404);
         }
 
-        return response()->json($juez, 200);
+        return response()->json($juez);
     }
 
     public function update(Request $request, $id)
@@ -73,12 +80,7 @@ class ProgramacionJuezController extends Controller
             ], 404);
         }
 
-        $validator = Validator::make($request->all(), [
-            'nombre' => 'required|max:50',
-            'numero_de_contacto' => 'required|max:15',
-            'sede' => 'required|max:100',
-            'encuentros_id' => 'required|exists:encuentros,id'
-        ]);
+        $validator = $this->validateData($request->all());
 
         if ($validator->fails()) {
             return response()->json([
@@ -94,7 +96,7 @@ class ProgramacionJuezController extends Controller
             'message' => 'Juez actualizado',
             'juez' => $juez,
             'status' => 200
-        ], 200);
+        ]);
     }
 
     public function updatePartial(Request $request, $id)
@@ -108,12 +110,7 @@ class ProgramacionJuezController extends Controller
             ], 404);
         }
 
-        $validator = Validator::make($request->all(), [
-            'nombre' => 'sometimes|required|max:50',
-            'numero_de_contacto' => 'sometimes|required|max:15',
-            'sede' => 'sometimes|required|max:100',
-            'encuentros_id' => 'sometimes|required|exists:encuentros,id'
-        ]);
+        $validator = $this->validateData($request->all(), true);
 
         if ($validator->fails()) {
             return response()->json([
@@ -129,7 +126,7 @@ class ProgramacionJuezController extends Controller
             'message' => 'Juez actualizado parcialmente',
             'juez' => $juez,
             'status' => 200
-        ], 200);
+        ]);
     }
 
     public function destroy($id)
@@ -148,6 +145,6 @@ class ProgramacionJuezController extends Controller
         return response()->json([
             'message' => 'Juez eliminado',
             'status' => 200
-        ], 200);
+        ]);
     }
 }
