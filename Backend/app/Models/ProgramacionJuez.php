@@ -21,7 +21,7 @@ class ProgramacionJuez extends Model
     ];
 
     // Relación con la tabla encuentros
-    public function encuentro()
+    public function encuentros()
     {
         return $this->belongsTo(Encuentro::class, 'encuentros_id');
     }

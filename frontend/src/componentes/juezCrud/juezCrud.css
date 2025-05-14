@@ -1,36 +1,60 @@
 .juez-crud {
-  max-width: 800px;
-  margin: auto;
+  max-width: 600px;
+  margin: 2rem auto;
   padding: 2rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.juez-form input {
+.juez-crud h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.juez-form input,
+.juez-form select {
   display: block;
   width: 100%;
-  margin-bottom: 0.75rem;
-  padding: 8px;
+  margin-bottom: 1rem;
+  padding: 10px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: border-color 0.3s;
 }
 
-.juez-form input.error {
+.juez-form input:focus,
+.juez-form select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.juez-form input.error,
+.juez-form select.error {
   border-color: red;
 }
 
 .error-message {
   color: red;
   font-size: 0.85rem;
-  margin-top: -0.5rem;
-  margin-bottom: 0.5rem;
+  margin-top: -0.75rem;
+  margin-bottom: 0.75rem;
 }
 
 .juez-form button {
-  padding: 0.5rem 1rem;
+  width: 100%;
+  padding: 0.75rem;
   background: #007bff;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1rem;
   cursor: pointer;
+  transition: background 0.3s ease;
 }
 
 .juez-form button:hover {
@@ -41,18 +65,37 @@ table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 2rem;
+  font-size: 0.95rem;
 }
 
-th, td {
+th,
+td {
   border: 1px solid #ddd;
-  padding: 8px;
+  padding: 10px;
   text-align: center;
 }
 
 th {
-  background: #f0f0f0;
+  background: #f8f9fa;
+  color: #333;
 }
 
-button {
-  margin: 0 5px;
+td {
+  background: #fff;
+}
+
+table button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  margin: 0 3px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s;
+}
+
+table button:hover {
+  background-color: #0056b3;
 }

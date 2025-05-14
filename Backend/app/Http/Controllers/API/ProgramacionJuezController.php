@@ -11,9 +11,8 @@ class ProgramacionJuezController extends Controller
 {
     public function index()
     {
-        $jueces = ProgramacionJuez::with('encuentro')->get();
+        $jueces = ProgramacionJuez::with('encuentros')->get();
 
-        // Siempre retornar un array, aunque esté vacío
         return response()->json($jueces);
     }
 
@@ -49,15 +48,19 @@ class ProgramacionJuezController extends Controller
 
         $juez = ProgramacionJuez::create($request->all());
 
+        // 🔥 Cargar la relación antes de devolver
+        $juez->load('encuentros');
+
         return response()->json([
             'juez' => $juez,
             'status' => 201
         ], 201);
     }
 
+
     public function show($id)
     {
-        $juez = ProgramacionJuez::with('encuentro')->find($id);
+        $juez = ProgramacionJuez::with('encuentros')->find($id);
 
         if (!$juez) {
             return response()->json([

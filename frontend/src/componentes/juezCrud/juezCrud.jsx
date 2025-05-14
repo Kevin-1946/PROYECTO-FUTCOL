@@ -10,7 +10,7 @@ import "./JuezCrud.css";
 
 const JuezCrud = () => {
   const [jueces, setJueces] = useState([]);
-  const [encuentros, setEncuentros] = useState([]);
+  const [encuentros, setEncuentros] = useState([]); // El estado de los encuentros
   const [form, setForm] = useState({
     nombre: "",
     numero_de_contacto: "",
@@ -20,6 +20,7 @@ const JuezCrud = () => {
   const [editId, setEditId] = useState(null);
   const [errors, setErrors] = useState({});
 
+  // Función para cargar los jueces
   const fetchJueces = async () => {
     try {
       const res = await getJueces();
@@ -29,15 +30,17 @@ const JuezCrud = () => {
     }
   };
 
+  // Función para cargar los encuentros
   const fetchEncuentros = async () => {
     try {
       const res = await getEncuentros();
-      setEncuentros(res.data);
+      setEncuentros(res.data); // Se actualiza el estado con la respuesta de los encuentros
     } catch (err) {
       console.error("Error al cargar encuentros:", err);
     }
   };
 
+  // Usamos useEffect para cargar los datos al montar el componente
   useEffect(() => {
     fetchJueces();
     fetchEncuentros();
@@ -158,6 +161,7 @@ const JuezCrud = () => {
         />
         {errors.sede && <div className="error-message">{errors.sede}</div>}
 
+        {/* Aquí agregamos la verificación de que 'encuentros' es un array antes de mapear */}
         <select
           name="encuentros_id"
           value={form.encuentros_id}
@@ -165,11 +169,15 @@ const JuezCrud = () => {
           className={errors.encuentros_id ? "error" : ""}
         >
           <option value="">Selecciona un encuentro</option>
-          {encuentros.map((e) => (
-            <option key={e.id} value={e.id}>
-              {e.nombre || `Encuentro #${e.id}`} {/* Ajusta según tus datos */}
-            </option>
-          ))}
+          {Array.isArray(encuentros) && encuentros.length > 0 ? (
+            encuentros.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.nombre || `Encuentro #${e.id}`} {/* Ajusta según tus datos */}
+              </option>
+            ))
+          ) : (
+            <option disabled>No hay encuentros disponibles</option>
+          )}
         </select>
         {errors.encuentros_id && (
           <div className="error-message">{errors.encuentros_id}</div>
