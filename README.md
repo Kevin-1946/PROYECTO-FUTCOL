@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/user-attachment/assets/..." alt="LOGO" width="180"/>
+  <img src="./LOGO.jpeg" alt="LOGO" width="200" />
 </p>
 
 # 🏆 FUTCOL
@@ -54,6 +54,6 @@ Ofreciendo una experiencia de juego competitiva y emocionante a través de torne
 Promocionando el deporte y fomentando la práctica del microfútbol como una actividad física sana y divertida para todas las edades. 
 El aplicativo se convertirá en un espacio donde la pasión por el microfútbol se une a la tecnología para crear una experiencia única e inolvidable para todos los participantes. 
 
-
+---
 
 
