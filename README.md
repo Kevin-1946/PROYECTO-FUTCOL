@@ -1,7 +1,6 @@
-<P>
-align="center"
-![LOGO](https://github.com/user-attachments/assets/ed937de3-3044-429e-b867-39042ea30b29)
-</P>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/ed937de3-3044-429e-b867-39042ea30b29" alt="LOGO" width="200"/>
+</p>
 
 
 FutCol
